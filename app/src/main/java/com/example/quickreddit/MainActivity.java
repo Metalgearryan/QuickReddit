@@ -7,6 +7,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.quickreddit.model.Feed;
+import com.example.quickreddit.model.entry.Entry;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,8 +40,33 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<Feed>() {
             @Override
             public void onResponse(Call<Feed> call, Response<Feed> response) {
-                Log.d(TAG, "onResponse: feed " + response.body().toString());
+                //Log.d(TAG, "onResponse: feed " + response.body().toString());
                 Log.d(TAG, "onResponse: Server Response: " + response.toString());
+
+                List<Entry> entrys = response.body().getEntrys();
+
+                Log.d(TAG, "onResponse: entrys: " + response.body().getEntrys());
+
+                //Log.d(TAG, "onResponse: author: " + entrys.get(0).getAuthor().getName());
+                //Log.d(TAG, "onResponse: updated: " + entrys.get(0).getUpdated());
+                //Log.d(TAG, "onResponse: title: " + entrys.get(0).getTitle());
+
+                for (int i = 0; i < entrys.size(); i++) {
+                    ExtractXML extractXML1 = new ExtractXML(entrys.get(0).getContent(), "<a href=");
+                    List<String> postContent = extractXML1.start();
+
+                    ExtractXML extractXML2 = new ExtractXML(entrys.get(0).getContent(), "<img src=");
+                    try {
+                        postContent.add(extractXML2.start().get(0));
+                    } catch (NullPointerException e) {
+                        postContent.add(null);
+                        Log.e(TAG, "onResponse: NullPointerException(Thumbnail): " + e.getMessage());
+                    } catch (IndexOutOfBoundsException e) {
+                        postContent.add(null);
+                        Log.e(TAG, "onResponse: IndexOutOfBoundsException(Thumbnail): " + e.getMessage());
+                    }
+                }
+
             }
 
             @Override

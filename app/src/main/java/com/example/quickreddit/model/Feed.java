@@ -27,7 +27,7 @@ public class Feed implements Serializable {
     @Element(name = "subtitle")
     private String subtitle;
 
-    @ElementList(inline = true, name = "entry")
+@ElementList(inline = true, name = "entry")
     private List<Entry> entrys;
 
     public String getIcon() {
