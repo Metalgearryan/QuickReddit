@@ -3,6 +3,9 @@ package com.example.quickreddit;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -26,12 +29,35 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String BASE_URL = "https://www.reddit.com/r/";
 
+    private Button btnRefreshFeed;
+    private EditText mFeedName;
+    private String currentFeed;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        btnRefreshFeed = (Button) findViewById(R.id.btnRefreshFeed);
+        mFeedName = (EditText) findViewById(R.id.etFeedName);
 
+        init();
+
+        btnRefreshFeed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String feedName = mFeedName.getText().toString();
+                if (!feedName.equals("")) {
+                    currentFeed = feedName;
+                    init();
+                } else {
+                    init();
+                }
+            }
+        });
+    }
+
+    private void init() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(SimpleXmlConverterFactory.create())
@@ -39,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         FeedAPI feedAPI = retrofit.create(FeedAPI.class);
 
-        Call<Feed> call = feedAPI.getFeed();
+        Call<Feed> call = feedAPI.getFeed(currentFeed);
 
         call.enqueue(new Callback<Feed>() {
             @Override
@@ -68,18 +94,30 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     int lastPosition = postContent.size() - 1;
-                    posts.add(new Post(
-                            entrys.get(i).getTitle(),
-                            entrys.get(i).getAuthor().getName(),
-                            entrys.get(i).getUpdated(),
-                            postContent.get(2),
-                            postContent.get(lastPosition)
-                    ));
+                    try {
+                        posts.add(new Post(
+                                entrys.get(i).getTitle(),
+                                entrys.get(i).getAuthor().getName(),
+                                entrys.get(i).getUpdated(),
+                                postContent.get(0),
+                                postContent.get(lastPosition)
+                        ));
+                    }catch (NullPointerException e){
+                        posts.add(new Post(
+                                entrys.get(i).getTitle(),
+                                "None" ,
+                                entrys.get(i).getUpdated(),
+                                postContent.get(0),
+                                postContent.get(lastPosition)
+                        ));
+                        Log.e(TAG, "onResponse: NullPointerException: " + e.getMessage());
+                    }
+
                 }
 
                 ListView listView = (ListView) findViewById(R.id.listView);
-                    CustomListAdapter customListAdapter = new CustomListAdapter(MainActivity.this, R.layout.card_view_main, posts);
-                    listView.setAdapter(customListAdapter);
+                CustomListAdapter customListAdapter = new CustomListAdapter(MainActivity.this, R.layout.card_view_main, posts);
+                listView.setAdapter(customListAdapter);
             }
 
             @Override
