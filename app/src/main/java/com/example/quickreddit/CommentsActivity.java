@@ -4,15 +4,19 @@ import android.app.AppComponentFactory;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.quickreddit.model.Feed;
+import com.example.quickreddit.model.entry.Entry;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -21,6 +25,15 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
 public class CommentsActivity extends AppCompatActivity {
 
@@ -34,15 +47,48 @@ public class CommentsActivity extends AppCompatActivity {
 
     private int defaultImage;
 
+    private String currentFeed;
+
+    private static final String BASE_URL = "https://www.reddit.com/r/";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
-
         setupImageLoader();
-
         initPost();
+        init();
+    }
 
+    private void init() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(SimpleXmlConverterFactory.create())
+                .build();
+
+        FeedAPI feedAPI = retrofit.create(FeedAPI.class);
+
+        Call<Feed> call = feedAPI.getFeed(currentFeed);
+
+        call.enqueue(new Callback<Feed>() {
+            @Override
+            public void onResponse(Call<Feed> call, Response<Feed> response) {
+                Log.d(TAG, "onResponse: Server Response: " + response.toString());
+
+                List<Entry> entrys = response.body().getEntrys();
+                for (int i = 0; i < entrys.size(); i++) {
+                    Log.d(TAG, "onResponse: entry: " + entrys.get(i).toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Feed> call, Throwable t) {
+
+                Log.e(TAG, "onFailure: Unable to retrieve RSS: " + t.getMessage());
+                Toast.makeText(CommentsActivity.this, "An Error Occured", Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 
     private void initPost() {
@@ -65,6 +111,15 @@ public class CommentsActivity extends AppCompatActivity {
         author.setText(postAuthor);
         updated.setText(postUpdated);
         displayImage(postThumbnailURL, thumbnail, progressBar);
+
+        try {
+            String[] splitURL = postURL.split(BASE_URL);
+            currentFeed = splitURL[1];
+            Log.d(TAG, "initPost: current feed: " + currentFeed);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            Log.e(TAG, "initPost: ArrayIndexOutOfBoundsException" + e.getMessage());
+        }
+
 
     }
 
