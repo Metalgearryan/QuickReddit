@@ -7,7 +7,7 @@ public class Comment {
     private String updated;
     private String id;
 
-    public Comment(String comment, String author, String updated, String id){
+    public Comment(String comment, String author, String updated, String id) {
         this.comment = comment;
         this.author = author;
         this.updated = updated;

@@ -51,6 +51,7 @@ public class CustomListAdapter extends ArrayAdapter<Post> {
 
     /**
      * Default constructor for the PersonListAdapter
+     *
      * @param context
      * @param resource
      * @param objects
@@ -69,7 +70,6 @@ public class CustomListAdapter extends ArrayAdapter<Post> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
 
-
         //get the persons information
         String title = getItem(position).getTitle();
         String imgUrl = getItem(position).getThumbnailURL();
@@ -77,7 +77,7 @@ public class CustomListAdapter extends ArrayAdapter<Post> {
         String date_updated = getItem(position).getDate_updated();
 
 
-        try{
+        try {
 
 
             //create the view result for showing the animation
@@ -86,10 +86,10 @@ public class CustomListAdapter extends ArrayAdapter<Post> {
             //ViewHolder object
             final ViewHolder holder;
 
-            if(convertView == null){
+            if (convertView == null) {
                 LayoutInflater inflater = LayoutInflater.from(mContext);
                 convertView = inflater.inflate(mResource, parent, false);
-                holder= new ViewHolder();
+                holder = new ViewHolder();
                 holder.title = (TextView) convertView.findViewById(R.id.cardTitle);
                 holder.thumbnailURL = (ImageView) convertView.findViewById(R.id.cardImage);
                 holder.author = (TextView) convertView.findViewById(R.id.cardAuthor);
@@ -99,11 +99,15 @@ public class CustomListAdapter extends ArrayAdapter<Post> {
                 result = convertView;
 
                 convertView.setTag(holder);
-            }
-            else{
+            } else {
                 holder = (ViewHolder) convertView.getTag();
                 result = convertView;
             }
+
+
+//            Animation animation = AnimationUtils.loadAnimation(mContext,
+//                    (position > lastPosition) ? R.anim.load_down_anim : R.anim.load_up_anim);
+//            result.startAnimation(animation);
 
             lastPosition = position;
 
@@ -114,7 +118,7 @@ public class CustomListAdapter extends ArrayAdapter<Post> {
             //create the imageloader object
             ImageLoader imageLoader = ImageLoader.getInstance();
 
-            int defaultImage = mContext.getResources().getIdentifier("@drawable/reddit_alien",null,mContext.getPackageName());
+            int defaultImage = mContext.getResources().getIdentifier("@drawable/reddit_alien", null, mContext.getPackageName());
 
             //create display options
             DisplayImageOptions options = new DisplayImageOptions.Builder().cacheInMemory(true)
@@ -124,19 +128,22 @@ public class CustomListAdapter extends ArrayAdapter<Post> {
                     .showImageOnLoading(defaultImage).build();
 
             //download and display image from url
-            imageLoader.displayImage(imgUrl, holder.thumbnailURL, options , new ImageLoadingListener() {
+            imageLoader.displayImage(imgUrl, holder.thumbnailURL, options, new ImageLoadingListener() {
                 @Override
                 public void onLoadingStarted(String imageUri, View view) {
                     holder.mProgressBar.setVisibility(View.VISIBLE);
                 }
+
                 @Override
                 public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                     holder.mProgressBar.setVisibility(View.GONE);
                 }
+
                 @Override
                 public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                     holder.mProgressBar.setVisibility(View.GONE);
                 }
+
                 @Override
                 public void onLoadingCancelled(String imageUri, View view) {
                     holder.mProgressBar.setVisibility(View.GONE);
@@ -145,8 +152,8 @@ public class CustomListAdapter extends ArrayAdapter<Post> {
             });
 
             return convertView;
-        }catch (IllegalArgumentException e){
-            Log.e(TAG, "getView: IllegalArgumentException: " + e.getMessage() );
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "getView: IllegalArgumentException: " + e.getMessage());
             return convertView;
         }
 
@@ -155,7 +162,7 @@ public class CustomListAdapter extends ArrayAdapter<Post> {
     /**
      * Required for setting up the Universal Image loader Library
      */
-    private void setupImageLoader(){
+    private void setupImageLoader() {
         // UNIVERSAL IMAGE LOADER SETUP
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                 .cacheOnDisc(true).cacheInMemory(true)
