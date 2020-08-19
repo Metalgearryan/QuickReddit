@@ -22,6 +22,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
+import com.example.quickreddit.Comments.CommentsActivity;
 import com.example.quickreddit.model.Feed;
 import com.example.quickreddit.model.entry.Entry;
 
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    private static final String BASE_URL = "https://www.reddit.com/r/";
+    URLS urls = new URLS();
 
     private Button btnRefreshFeed;
     private EditText mFeedName;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(urls.BASE_URL)
                 .addConverterFactory(SimpleXmlConverterFactory.create())
                 .build();
 

@@ -1,6 +1,5 @@
-package com.example.quickreddit;
+package com.example.quickreddit.Comments;
 
-import android.app.AppComponentFactory;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -15,6 +14,10 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.quickreddit.ExtractXML;
+import com.example.quickreddit.FeedAPI;
+import com.example.quickreddit.R;
+import com.example.quickreddit.URLS;
 import com.example.quickreddit.model.Feed;
 import com.example.quickreddit.model.entry.Entry;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
@@ -38,6 +41,7 @@ import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 public class CommentsActivity extends AppCompatActivity {
 
     private static final String TAG = "CommentsActivity";
+    URLS urls = new URLS();
 
     private static String postURL;
     private static String postThumbnailURL;
@@ -49,7 +53,7 @@ public class CommentsActivity extends AppCompatActivity {
 
     private String currentFeed;
 
-    private static final String BASE_URL = "https://www.reddit.com/r/";
+    private ArrayList<Comment> mComments;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,7 +66,7 @@ public class CommentsActivity extends AppCompatActivity {
 
     private void init() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(urls.BASE_URL)
                 .addConverterFactory(SimpleXmlConverterFactory.create())
                 .build();
 
@@ -77,7 +81,8 @@ public class CommentsActivity extends AppCompatActivity {
 
                 List<Entry> entrys = response.body().getEntrys();
                 for (int i = 0; i < entrys.size(); i++) {
-                    Log.d(TAG, "onResponse: entry: " + entrys.get(i).toString());
+                    ExtractXML extract = new ExtractXML(entrys.get(i).getContent(), "<div class=\"md\"><p>", "</p>");
+                    extract.start();
                 }
             }
 
@@ -113,7 +118,7 @@ public class CommentsActivity extends AppCompatActivity {
         displayImage(postThumbnailURL, thumbnail, progressBar);
 
         try {
-            String[] splitURL = postURL.split(BASE_URL);
+            String[] splitURL = postURL.split(urls.BASE_URL);
             currentFeed = splitURL[1];
             Log.d(TAG, "initPost: current feed: " + currentFeed);
         } catch (ArrayIndexOutOfBoundsException e) {
