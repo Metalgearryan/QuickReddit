@@ -20,6 +20,7 @@ import com.example.quickreddit.ExtractXML;
 import com.example.quickreddit.FeedAPI;
 import com.example.quickreddit.R;
 import com.example.quickreddit.URLS;
+import com.example.quickreddit.WebViewActivity;
 import com.example.quickreddit.model.Feed;
 import com.example.quickreddit.model.entry.Entry;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
@@ -167,7 +168,6 @@ public class CommentsActivity extends AppCompatActivity {
         updated.setText(postUpdated);
         displayImage(postThumbnailURL, thumbnail, progressBar);
 
-        //NOTE: NSFW posts will cause an error. We can catch it with ArrayIndexOutOfBoundsException
         try {
             String[] splitURL = postURL.split(urls.BASE_URL);
             currentFeed = splitURL[1];
@@ -175,6 +175,16 @@ public class CommentsActivity extends AppCompatActivity {
         } catch (ArrayIndexOutOfBoundsException e) {
             Log.e(TAG, "initPost: ArrayIndexOutOfBoundsException: " + e.getMessage());
         }
+
+        thumbnail.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Log.d(TAG, "onClick: Opening URL in webview: " + postURL);
+                Intent intent =  new Intent(CommentsActivity.this, WebViewActivity.class);
+                intent.putExtra("url", postURL);
+                startActivity(intent);
+            }
+        });
 
 
     }
