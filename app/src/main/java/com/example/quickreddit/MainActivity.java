@@ -29,7 +29,6 @@ import com.example.quickreddit.model.entry.Entry;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-
     URLS urls = new URLS();
 
     private Button btnRefreshFeed;
@@ -41,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d(TAG, "onCreate: starting.");
         btnRefreshFeed = (Button) findViewById(R.id.btnRefreshFeed);
         mFeedName = (EditText) findViewById(R.id.etFeedName);
 
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnRefreshFeed.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 String feedName = mFeedName.getText().toString();
                 if (!feedName.equals("")) {
                     currentFeed = feedName;
@@ -58,7 +58,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
+
 
     private void init() {
         Retrofit retrofit = new Retrofit.Builder()
@@ -73,16 +75,18 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<Feed>() {
             @Override
             public void onResponse(Call<Feed> call, Response<Feed> response) {
+                //Log.d(TAG, "onResponse: feed: " + response.body().toString());
                 Log.d(TAG, "onResponse: Server Response: " + response.toString());
 
                 List<Entry> entrys = response.body().getEntrys();
 
                 Log.d(TAG, "onResponse: entrys: " + response.body().getEntrys());
 
-                 ArrayList<Post> posts = new ArrayList<Post>();
+                final ArrayList<Post> posts = new ArrayList<Post>();
                 for (int i = 0; i < entrys.size(); i++) {
                     ExtractXML extractXML1 = new ExtractXML(entrys.get(i).getContent(), "<a href=");
                     List<String> postContent = extractXML1.start();
+
 
                     ExtractXML extractXML2 = new ExtractXML(entrys.get(i).getContent(), "<img src=");
 
@@ -105,10 +109,10 @@ public class MainActivity extends AppCompatActivity {
                                 postContent.get(0),
                                 postContent.get(lastPosition)
                         ));
-                    }catch (NullPointerException e){
+                    } catch (NullPointerException e) {
                         posts.add(new Post(
                                 entrys.get(i).getTitle(),
-                                "None" ,
+                                "None",
                                 entrys.get(i).getUpdated(),
                                 postContent.get(0),
                                 postContent.get(lastPosition)
@@ -118,14 +122,23 @@ public class MainActivity extends AppCompatActivity {
 
                 }
 
+                for (int j = 0; j < posts.size(); j++) {
+                    Log.d(TAG, "onResponse: \n " +
+                            "PostURL: " + posts.get(j).getPostURL() + "\n " +
+                            "ThumbnailURL: " + posts.get(j).getThumbnailURL() + "\n " +
+                            "Title: " + posts.get(j).getTitle() + "\n " +
+                            "Author: " + posts.get(j).getAuthor() + "\n " +
+                            "updated: " + posts.get(j).getDate_updated() + "\n ");
+                }
+
                 ListView listView = (ListView) findViewById(R.id.listView);
-                CustomListAdapter customListAdapter = new CustomListAdapter(MainActivity.this, R.layout.card_view_main, posts);
+                CustomListAdapter customListAdapter = new CustomListAdapter(MainActivity.this, R.layout.card_layout_main, posts);
                 listView.setAdapter(customListAdapter);
 
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                        Log.d(TAG, "onItemClick: Clicked" + posts.get(position).toString());
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Log.d(TAG, "onItemClick: Clicked: " + posts.get(position).toString());
                         Intent intent = new Intent(MainActivity.this, CommentsActivity.class);
                         intent.putExtra("@string/post_url", posts.get(position).getPostURL());
                         intent.putExtra("@string/post_thumbnail", posts.get(position).getThumbnailURL());

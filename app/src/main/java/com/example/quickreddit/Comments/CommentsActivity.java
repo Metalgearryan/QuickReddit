@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +54,10 @@ public class CommentsActivity extends AppCompatActivity {
     private int defaultImage;
 
     private String currentFeed;
+    private ListView mListView;
+
+    private ProgressBar mProgressBar;
+    private TextView progressText;
 
     private ArrayList<Comment> mComments;
 
@@ -59,6 +65,9 @@ public class CommentsActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
+        mProgressBar = (ProgressBar) findViewById(R.id.commentsLoadingProgressBar);
+        progressText = (TextView) findViewById(R.id.progressText);
+        mProgressBar.setVisibility(View.VISIBLE);
         setupImageLoader();
         initPost();
         init();
@@ -79,11 +88,48 @@ public class CommentsActivity extends AppCompatActivity {
             public void onResponse(Call<Feed> call, Response<Feed> response) {
                 Log.d(TAG, "onResponse: Server Response: " + response.toString());
 
+                mComments = new ArrayList<Comment>();
                 List<Entry> entrys = response.body().getEntrys();
-                for (int i = 0; i < entrys.size(); i++) {
-                    ExtractXML extract = new ExtractXML(entrys.get(i).getContent(), "<div class=\"md\"><p>", "</p>");
-                    extract.start();
+                for ( int i = 0; i < entrys.size(); i++){
+                    ExtractXML extract = new ExtractXML(entrys.get(i).getContent(), "<div class=\"md\"><p>","</p>");
+                    List<String> commentDetails = extract.start();
+
+
+                    try{
+                        mComments.add(new Comment(
+                                commentDetails.get(0),
+                                entrys.get(i).getAuthor().getName(),
+                                entrys.get(i).getUpdated(),
+                                entrys.get(i).getId()
+
+                        ));
+                    }catch (IndexOutOfBoundsException e){
+                        mComments.add(new Comment(
+                                "Error reading comment",
+                                "None",
+                                "None",
+                                "None"
+                        ));
+                        Log.e(TAG, "onResponse: IndexOutOfBoundsException: " + e.getMessage() );
+                    }
+                    catch (NullPointerException e){
+                        mComments.add(new Comment(
+                                commentDetails.get(0),
+                                "None",
+                                entrys.get(i).getUpdated(),
+                                entrys.get(i).getId()
+
+                        ));
+                        Log.e(TAG, "onResponse: NullPointerException: " + e.getMessage() );
+                    }
                 }
+
+                mListView = (ListView) findViewById(R.id.commentsListView);
+                CommentsListAdapter adapter = new CommentsListAdapter(CommentsActivity.this, R.layout.comments_layout, mComments);
+                mListView.setAdapter(adapter);
+
+                mProgressBar.setVisibility(View.GONE);
+                progressText.setText("");
             }
 
             @Override
@@ -122,7 +168,7 @@ public class CommentsActivity extends AppCompatActivity {
             currentFeed = splitURL[1];
             Log.d(TAG, "initPost: current feed: " + currentFeed);
         } catch (ArrayIndexOutOfBoundsException e) {
-            Log.e(TAG, "initPost: ArrayIndexOutOfBoundsException" + e.getMessage());
+            Log.e(TAG, "initPost: ArrayIndexOutOfBoundsException: " + e.getMessage());
         }
 
 

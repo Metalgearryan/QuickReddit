@@ -61,6 +61,14 @@ public class Entry implements Serializable {
         return updated;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public void setUpdated(String updated) {
         this.updated = updated;
     }

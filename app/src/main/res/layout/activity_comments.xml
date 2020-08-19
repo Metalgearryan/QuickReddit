@@ -95,7 +95,8 @@
             android:layout_alignBottom="@+id/commentsLoadingProgressBar"
             android:text="Loading Comments"
             android:textSize="10sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:id="@+id/progressText"/>
 
         <ListView
             android:id="@+id/commentsListView"
