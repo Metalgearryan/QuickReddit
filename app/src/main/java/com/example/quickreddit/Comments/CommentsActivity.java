@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -17,9 +19,12 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
+import com.example.quickreddit.Account.LoginActivity;
 import com.example.quickreddit.ExtractXML;
 import com.example.quickreddit.FeedAPI;
+import com.example.quickreddit.MainActivity;
 import com.example.quickreddit.R;
 import com.example.quickreddit.URLS;
 import com.example.quickreddit.WebViewActivity;
@@ -72,6 +77,7 @@ public class CommentsActivity extends AppCompatActivity {
         progressText = (TextView) findViewById(R.id.progressText);
         Log.d(TAG, "onCreate: Started.");
 
+        setupToolbar();
 
         mProgressBar.setVisibility(View.VISIBLE);
 
@@ -81,6 +87,26 @@ public class CommentsActivity extends AppCompatActivity {
 
         init();
 
+    }
+
+    private void setupToolbar(){
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
+        setSupportActionBar(toolbar);
+
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Log.d(TAG, "onMenuItemClick: clicked menu item: " + menuItem);
+
+                switch (menuItem.getItemId()){
+                    case R.id.navLogin:
+                        Intent intent = new Intent(CommentsActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                }
+
+                return false;
+            }
+        });
     }
 
     private void init() {
@@ -275,4 +301,11 @@ public class CommentsActivity extends AppCompatActivity {
 
         defaultImage = CommentsActivity.this.getResources().getIdentifier("@drawable/reddit_alien", null, CommentsActivity.this.getPackageName());
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.navigation_menu, menu);
+        return true;
+    }
+
 }

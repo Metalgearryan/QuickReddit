@@ -2,16 +2,22 @@ package com.example.quickreddit;
 
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
+//import android.widget.Toolbar;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +28,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
+import com.example.quickreddit.Account.LoginActivity;
 import com.example.quickreddit.Comments.CommentsActivity;
 import com.example.quickreddit.model.Feed;
 import com.example.quickreddit.model.entry.Entry;
@@ -44,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         btnRefreshFeed = (Button) findViewById(R.id.btnRefreshFeed);
         mFeedName = (EditText) findViewById(R.id.etFeedName);
 
+        setupToolbar();
+
         init();
 
         btnRefreshFeed.setOnClickListener(new View.OnClickListener() {
@@ -59,6 +68,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    private void setupToolbar(){
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
+        setSupportActionBar(toolbar);
+
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                Log.d(TAG, "onMenuItemClick: clicked menu item: " + menuItem);
+
+                switch (menuItem.getItemId()){
+                    case R.id.navLogin:
+                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                }
+
+                return false;
+            }
+        });
     }
 
 
@@ -158,4 +188,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.navigation_menu, menu);
+        return true;
+    }
+
 }
