@@ -1,5 +1,5 @@
 # QuickReddit
-#Still In Development
+# Still In Development
 
 A quick and easy to use Reddit app for Android!
 
