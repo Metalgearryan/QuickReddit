@@ -57,5 +57,8 @@ dependencies {
     //Design Library for Coordinator Layout
     implementation 'com.google.android.material:material:1.2.0'
 
+    //Gson Converter
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
 
 }
