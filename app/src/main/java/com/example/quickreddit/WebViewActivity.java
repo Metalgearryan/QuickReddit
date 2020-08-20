@@ -18,7 +18,7 @@ public class WebViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstaceState){
         super.onCreate(savedInstaceState);
-        setContentView(R.layout.webview_layout);
+        setContentView(R.layout.webview_activity);
         WebView webView = (WebView) findViewById(R.id.webview);
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.webviewLoadingProgressBar);
         final TextView loadingText = (TextView) findViewById(R.id.progressText);

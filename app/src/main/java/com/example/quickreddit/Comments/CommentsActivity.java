@@ -1,10 +1,12 @@
 package com.example.quickreddit.Comments;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -94,7 +96,6 @@ public class CommentsActivity extends AppCompatActivity {
         call.enqueue(new Callback<Feed>() {
             @Override
             public void onResponse(Call<Feed> call, Response<Feed> response) {
-                //Log.d(TAG, "onResponse: feed: " + response.body().toString());
                 Log.d(TAG, "onResponse: Server Response: " + response.toString());
 
                 mComments = new ArrayList<Comment>();
@@ -135,6 +136,12 @@ public class CommentsActivity extends AppCompatActivity {
                 CommentsListAdapter adapter = new CommentsListAdapter(CommentsActivity.this, R.layout.comments_layout, mComments);
                 mListView.setAdapter(adapter);
 
+                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        getUserComment();
+                    }
+                });
 
                 mProgressBar.setVisibility(View.GONE);
                 progressText.setText("");
@@ -176,6 +183,14 @@ public class CommentsActivity extends AppCompatActivity {
             Log.e(TAG, "initPost: ArrayIndexOutOfBoundsException: " + e.getMessage());
         }
 
+        btnReply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onCLick: reply.");
+                getUserComment();
+            }
+        });
+
         thumbnail.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -187,6 +202,18 @@ public class CommentsActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void getUserComment(){
+        final Dialog dialog = new Dialog(CommentsActivity.this);
+        dialog.setTitle("dialog");
+        dialog.setContentView(R.layout.comment_input_dialog);
+
+        int width = (int)(getResources().getDisplayMetrics().widthPixels*0.95);
+        int height = (int)(getResources().getDisplayMetrics().heightPixels*0.5);
+
+        dialog.getWindow().setLayout(width, height);
+        dialog.show();
     }
 
 
