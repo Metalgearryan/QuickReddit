@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.example.quickreddit.Account.CheckLogin;
 import com.example.quickreddit.Account.LoginActivity;
 import com.example.quickreddit.ExtractXML;
 import com.example.quickreddit.FeedAPI;
@@ -42,12 +43,14 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
 public class CommentsActivity extends AppCompatActivity {
@@ -172,10 +175,17 @@ public class CommentsActivity extends AppCompatActivity {
                 CommentsListAdapter adapter = new CommentsListAdapter(CommentsActivity.this, R.layout.comments_layout, mComments);
                 mListView.setAdapter(adapter);
 
-                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                /*mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         getUserComment(postID);
+                    }
+                });*/
+
+                mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        getUserComment(mComments.get(position).getId());
                     }
                 });
 
@@ -260,6 +270,52 @@ public class CommentsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.d(TAG, "onClick: Attempting to post comment.");
 
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(urls.COMMENT_URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                FeedAPI feedAPI = retrofit.create(FeedAPI.class);
+
+                HashMap<String, String> headerMap = new HashMap<>();
+                headerMap.put("User-Agent", username);
+                headerMap.put("X-Modhash", modhash);
+                headerMap.put("cookie", "reddit_session=" + cookie);
+
+                Log.d(TAG, "btnPostComment: Stroing session varialbes: \n" +
+                        "username: " + username + "\n" +
+                        "modhash: " + modhash + "\n" +
+                        "cookie: " + cookie + "\n");
+
+                String theComment = comment.getText().toString();
+                Call<CheckComment> call = feedAPI.submitComment(headerMap, "comment", post_id, theComment);
+
+                call.enqueue(new Callback<CheckComment>() {
+                    @Override
+                    public void onResponse(Call<CheckComment> call, Response<CheckComment> response) {
+                        try {
+                            Log.d(TAG, "onResponse: Server Response: " + response.toString());
+                            String postSuccess = response.body().getSuccess();
+
+                            if (postSuccess.equals("true")) {
+                                dialog.dismiss();
+                                Toast.makeText(CommentsActivity.this, "Post Successful", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(CommentsActivity.this, "An Error Occured Did you sign in?", Toast.LENGTH_SHORT).show();
+                            }
+
+                        } catch (NullPointerException e) {
+                            Log.e(TAG, "onResponse: NullPointerException: " + e.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CheckComment> call, Throwable t) {
+                        Log.e(TAG, "onFailure: Unable to retrieve RSS: " + t.getMessage());
+                        Toast.makeText(CommentsActivity.this, "An Error Occured", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
         });
     }
@@ -271,6 +327,12 @@ public class CommentsActivity extends AppCompatActivity {
         username = preferences.getString("@string/SessionUsername", "");
         modhash = preferences.getString("@string/SessionModhash", "");
         cookie = preferences.getString("@string/SessionCookie", "");
+
+        Log.d(TAG, "getSessionParms: Stroing session varialbes: \n" +
+                "username: " + username + "\n" +
+                "modhash: " + modhash + "\n" +
+                "cookie: " + cookie + "\n");
+
     }
 
 

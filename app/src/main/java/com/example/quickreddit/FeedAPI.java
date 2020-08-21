@@ -2,6 +2,7 @@ package com.example.quickreddit;
 
 
 import com.example.quickreddit.Account.CheckLogin;
+import com.example.quickreddit.Comments.CheckComment;
 import com.example.quickreddit.model.Feed;
 
 import java.util.Map;
@@ -27,6 +28,14 @@ public interface FeedAPI {
             @Query("user") String user,
             @Query("passwd") String password,
             @Query("api_type") String type
+    );
+
+    @POST("{comment}")
+    Call<CheckComment> submitComment(
+            @HeaderMap Map<String, String> headers,
+            @Path("comment") String comment,
+            @Query("parent") String parent,
+            @Query("amd;text") String text
     );
 
 }
