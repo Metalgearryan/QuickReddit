@@ -2,8 +2,10 @@ package com.example.quickreddit.Comments;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -58,6 +60,11 @@ public class CommentsActivity extends AppCompatActivity {
     private static String postTitle;
     private static String postAuthor;
     private static String postUpdated;
+    private static String postID;
+
+    private String modhash;
+    private String cookie;
+    private String username;
 
     private int defaultImage;
 
@@ -79,6 +86,8 @@ public class CommentsActivity extends AppCompatActivity {
 
         setupToolbar();
 
+        getSessionParms();
+
         mProgressBar.setVisibility(View.VISIBLE);
 
         setupImageLoader();
@@ -89,7 +98,8 @@ public class CommentsActivity extends AppCompatActivity {
 
     }
 
-    private void setupToolbar(){
+
+    private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
 
@@ -98,7 +108,7 @@ public class CommentsActivity extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 Log.d(TAG, "onMenuItemClick: clicked menu item: " + menuItem);
 
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.navLogin:
                         Intent intent = new Intent(CommentsActivity.this, LoginActivity.class);
                         startActivity(intent);
@@ -165,7 +175,7 @@ public class CommentsActivity extends AppCompatActivity {
                 mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        getUserComment();
+                        getUserComment(postID);
                     }
                 });
 
@@ -188,6 +198,7 @@ public class CommentsActivity extends AppCompatActivity {
         postTitle = incomingIntent.getStringExtra("@string/post_title");
         postAuthor = incomingIntent.getStringExtra("@string/post_author");
         postUpdated = incomingIntent.getStringExtra("@string/post_updated");
+        postID = incomingIntent.getStringExtra("@string/post_id");
 
         TextView title = (TextView) findViewById(R.id.postTitle);
         TextView author = (TextView) findViewById(R.id.postAuthor);
@@ -213,15 +224,15 @@ public class CommentsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onCLick: reply.");
-                getUserComment();
+                getUserComment(postID);
             }
         });
 
-        thumbnail.setOnClickListener(new View.OnClickListener(){
+        thumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
+            public void onClick(View v) {
                 Log.d(TAG, "onClick: Opening URL in webview: " + postURL);
-                Intent intent =  new Intent(CommentsActivity.this, WebViewActivity.class);
+                Intent intent = new Intent(CommentsActivity.this, WebViewActivity.class);
                 intent.putExtra("url", postURL);
                 startActivity(intent);
             }
@@ -230,16 +241,36 @@ public class CommentsActivity extends AppCompatActivity {
 
     }
 
-    private void getUserComment(){
+    private void getUserComment(String post_id) {
         final Dialog dialog = new Dialog(CommentsActivity.this);
         dialog.setTitle("dialog");
         dialog.setContentView(R.layout.comment_input_dialog);
 
-        int width = (int)(getResources().getDisplayMetrics().widthPixels*0.95);
-        int height = (int)(getResources().getDisplayMetrics().heightPixels*0.5);
+        int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.95);
+        int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.5);
 
         dialog.getWindow().setLayout(width, height);
         dialog.show();
+
+        Button btnPostComment = (Button) dialog.findViewById(R.id.btnPostComment);
+        final EditText comment = (EditText) dialog.findViewById(R.id.dialogComment);
+
+        btnPostComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: Attempting to post comment.");
+
+            }
+        });
+    }
+
+
+    private void getSessionParms() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(CommentsActivity.this);
+
+        username = preferences.getString("@string/SessionUsername", "");
+        modhash = preferences.getString("@string/SessionModhash", "");
+        cookie = preferences.getString("@string/SessionCookie", "");
     }
 
 
@@ -303,9 +334,15 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.navigation_menu, menu);
         return true;
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        getSessionParms();
     }
 
 }

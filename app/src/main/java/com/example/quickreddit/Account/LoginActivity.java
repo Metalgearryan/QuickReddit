@@ -1,6 +1,8 @@
 package com.example.quickreddit.Account;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -79,15 +81,53 @@ public class LoginActivity extends AppCompatActivity {
         call.enqueue(new Callback<CheckLogin>() {
             @Override
             public void onResponse(Call<CheckLogin> call, Response<CheckLogin> response) {
-                Log.d(TAG, "onResponse: feed" + response.body().toString());
-                Log.d(TAG, "onResponse: Server Response: " + response.toString());
+                try {
+                    Log.d(TAG, "onResponse: Server Response: " + response.toString());
+
+                    String modhash = response.body().getJson().getData().getModhash();
+                    String cookie = response.body().getJson().getData().getCookie();
+                    Log.d(TAG, "onResponse: modhash" + modhash);
+                    Log.d(TAG, "onResponse: cookie" + cookie);
+
+                    if (!modhash.equals("")) {
+                        setSessionParams(username, modhash, cookie);
+                        mProgressBar.setVisibility(View.GONE);
+                        mUsername.setText("");
+                        mPassword.setText("");
+                        Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+
+                        //navigate to previous activity
+                        finish();
+                    }
+                } catch (NullPointerException e) {
+                    Log.e(TAG, "onResponse: NullPointerException: " + e.getMessage());
+                }
             }
 
             @Override
             public void onFailure(Call<CheckLogin> call, Throwable t) {
+                mProgressBar.setVisibility(View.GONE);
                 Log.e(TAG, "onFailure: Unable to retrieve RSS: " + t.getMessage());
                 Toast.makeText(LoginActivity.this, "An Error Occured", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void setSessionParams(String username, String modhash, String cookie) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        Log.d(TAG, "setSessionParams : Storing session varialbles: \n" +
+                "username: " + username + "\n" +
+                "modhash: " + modhash + "\n" +
+                "cookie: " + cookie + "\n"
+        );
+
+        editor.putString("@string/SessionUsername", username);
+        editor.commit();
+        editor.putString("@string/SessionModhash", modhash);
+        editor.commit();
+        editor.putString("@string/SessionCoodie", cookie);
+        editor.commit();
     }
 }

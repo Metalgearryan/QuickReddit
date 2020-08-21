@@ -5,4 +5,8 @@
     <string name="post_title">post_title</string>
     <string name="post_author">post_author</string>
     <string name="post_updated">post_updatec</string>
+    <string name="post_id">post_id</string>
+    <string name="SessionUsername">com.example.quickreddit.Account.SessionUsername</string>
+    <string name="SessionModhash">com.example.quickreddit.Account.SessionModhash</string>
+    <string name="SessionCookies">com.example.quickreddit.Account.SessionCookie</string>
 </resources>

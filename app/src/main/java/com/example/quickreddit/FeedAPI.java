@@ -14,6 +14,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface FeedAPI {
+
     String BASE_URL = "https://www.reddit.com/r/";
 
     @GET("{feed_name}/.rss")
@@ -21,11 +22,11 @@ public interface FeedAPI {
 
     @POST("{user}")
     Call<CheckLogin> signIn(
-         @HeaderMap Map<String,String> headers,
-         @Path("user") String username,
-         @Query("user") String user,
-         @Query("passwd") String password,
-         @Query("api_type") String type
+            @HeaderMap Map<String, String> headers,
+            @Path("user") String username,
+            @Query("user") String user,
+            @Query("passwd") String password,
+            @Query("api_type") String type
     );
 
 }

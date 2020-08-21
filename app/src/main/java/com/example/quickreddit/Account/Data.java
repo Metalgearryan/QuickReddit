@@ -9,9 +9,10 @@ public class Data {
     @Expose
     private String modhash;
 
-    @SerializedName("cooke")
+    @SerializedName("cookie")
     @Expose
     private String cookie;
+
 
     public String getModhash() {
         return modhash;

@@ -3,6 +3,6 @@
 
     <item
         android:title="Login"
-        android:id="@+id/navLogin"/>
+        android:id="@+id/navLogin" />
 
 </menu>

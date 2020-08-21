@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void setupToolbar(){
+    private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
 
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem menuItem) {
                 Log.d(TAG, "onMenuItemClick: clicked menu item: " + menuItem);
 
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.navLogin:
                         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                         startActivity(intent);
@@ -137,7 +137,9 @@ public class MainActivity extends AppCompatActivity {
                                 entrys.get(i).getAuthor().getName(),
                                 entrys.get(i).getUpdated(),
                                 postContent.get(0),
-                                postContent.get(lastPosition)
+                                postContent.get(lastPosition),
+                                entrys.get(i).getId()
+
                         ));
                     } catch (NullPointerException e) {
                         posts.add(new Post(
@@ -145,20 +147,12 @@ public class MainActivity extends AppCompatActivity {
                                 "None",
                                 entrys.get(i).getUpdated(),
                                 postContent.get(0),
-                                postContent.get(lastPosition)
+                                postContent.get(lastPosition),
+                                entrys.get(i).getId()
                         ));
                         Log.e(TAG, "onResponse: NullPointerException: " + e.getMessage());
                     }
 
-                }
-
-                for (int j = 0; j < posts.size(); j++) {
-                    Log.d(TAG, "onResponse: \n " +
-                            "PostURL: " + posts.get(j).getPostURL() + "\n " +
-                            "ThumbnailURL: " + posts.get(j).getThumbnailURL() + "\n " +
-                            "Title: " + posts.get(j).getTitle() + "\n " +
-                            "Author: " + posts.get(j).getAuthor() + "\n " +
-                            "updated: " + posts.get(j).getDate_updated() + "\n ");
                 }
 
                 ListView listView = (ListView) findViewById(R.id.listView);
@@ -175,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("@string/post_title", posts.get(position).getTitle());
                         intent.putExtra("@string/post_author", posts.get(position).getAuthor());
                         intent.putExtra("@string/post_updated", posts.get(position).getDate_updated());
+                        intent.putExtra("@string/post_id", posts.get(position).getId());
                         startActivity(intent);
                     }
                 });
@@ -190,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.navigation_menu, menu);
         return true;
     }
