@@ -1,5 +1,6 @@
 package com.example.quickreddit.Account;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -36,6 +37,28 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPassword;
 
     private URLS urls = new URLS();
+
+    //OAth
+    private static final String AUTH_URL =
+            "https://www.reddit.com/api/v1/authorize.compact?client_id=%s" +
+                    "&response_type=code&state=%s&redirect_uri=%s&" +
+                    "duration=permanent&scope=identity";
+
+    private static final String CLIENT_ID = "ABCDEFGHIJKLM012345-AA";
+
+    private static final String REDIRECT_URI =
+            "http://www.example.com/my_redirect";
+
+    private static final String STATE = "MY_RANDOM_STRING_1";
+
+    private static final String ACCESS_TOKEN_URL =
+            "https://www.reddit.com/api/v1/access_token";
+
+    public void startSignIn(View view) {
+        String url = String.format(AUTH_URL, CLIENT_ID, STATE, REDIRECT_URI);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(intent);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
