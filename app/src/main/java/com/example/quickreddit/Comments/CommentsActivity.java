@@ -87,7 +87,6 @@ public class CommentsActivity extends AppCompatActivity {
         progressText = (TextView) findViewById(R.id.progressText);
         Log.d(TAG, "onCreate: Started.");
 
-        setupToolbar();
 
         getSessionParms();
 
@@ -101,30 +100,6 @@ public class CommentsActivity extends AppCompatActivity {
 
     }
 
-
-    private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
-        setSupportActionBar(toolbar);
-
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Log.d(TAG, "onMenuItemClick: clicked menu item: " + item);
-
-                switch (item.getItemId()) {
-                    case R.id.navLogin:
-                        Intent intent = new Intent(CommentsActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                }
-
-                return false;
-            }
-        });
-    }
-
-    /**
-     * Retrieve the comments from the chosen post
-     */
     private void init() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(urls.BASE_URL)

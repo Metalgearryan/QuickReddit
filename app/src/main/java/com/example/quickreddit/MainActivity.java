@@ -51,8 +51,6 @@ public class MainActivity extends AppCompatActivity {
         btnRefreshFeed = (Button) findViewById(R.id.btnRefreshFeed);
         mFeedName = (EditText) findViewById(R.id.etFeedName);
 
-        setupToolbar();
-
         init();
 
         btnRefreshFeed.setOnClickListener(new View.OnClickListener() {
@@ -70,26 +68,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-    private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
-        setSupportActionBar(toolbar);
-
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                Log.d(TAG, "onMenuItemClick: clicked menu item: " + menuItem);
-
-                switch (menuItem.getItemId()) {
-                    case R.id.navLogin:
-                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                        startActivity(intent);
-                }
-
-                return false;
-            }
-        });
-    }
 
 
     private void init() {
