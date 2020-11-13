@@ -189,7 +189,6 @@ public class CommentsActivity extends AppCompatActivity {
         TextView author = (TextView) findViewById(R.id.postAuthor);
         TextView updated = (TextView) findViewById(R.id.postUpdated);
         ImageView thumbnail = (ImageView) findViewById(R.id.postThumbnail);
-        Button btnReply = (Button) findViewById(R.id.btnPostReply);
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.postLoadingProgressBar);
 
         title.setText(postTitle);
@@ -206,13 +205,6 @@ public class CommentsActivity extends AppCompatActivity {
             Log.e(TAG, "initPost: ArrayIndexOutOfBoundsException: " + e.getMessage());
         }
 
-        btnReply.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "onClick: reply.");
-                getUserComment(postID);
-            }
-        });
 
         thumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
